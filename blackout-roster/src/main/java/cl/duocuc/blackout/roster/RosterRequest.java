@@ -7,5 +7,5 @@ public record RosterRequest(
     @Size(max = 150) String label,
     @Size(max = 20) String number,
     @Size(max = 100) String status,
-    @NotNull @Size(max = 50) List<@NotNull @Positive Long> playerIds
+    @NotNull @Size(max = 50) List<@NotBlank @Size(max = 60) String> playerIds
 ) { }

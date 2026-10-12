@@ -21,7 +21,7 @@ class CrudApiTests {
     @Autowired ObjectMapper mapper;
     @Autowired RosterRepository repository;
     static final String BASE = "/api/rosters";
-    static final String BODY = "{\"name\":\"Blackout\",\"game\":\"Valorant\",\"label\":\"Equipo principal\",\"number\":\"01\",\"status\":\"Activo\",\"playerIds\":[1,2]}";
+    static final String BODY = "{\"name\":\"Blackout\",\"game\":\"Valorant\",\"label\":\"Equipo principal\",\"number\":\"01\",\"status\":\"Activo\",\"playerIds\":[\"prinzcl\",\"nightowl\"]}";
     @BeforeEach void clear() { repository.deleteAll(); }
     private long create() throws Exception {
         var result = mvc.perform(post(BASE).header("Authorization", "Bearer " + TestTokens.admin())
@@ -35,12 +35,13 @@ class CrudApiTests {
             .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(1));
         mvc.perform(get(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.staff()))
             .andExpect(status().isOk()).andExpect(jsonPath("$.id").value(id));
-        String updated = BODY.replace("Blackout", "Academy").replace("[1,2]", "[2,1]");
+        String updated = BODY.replace("Blackout", "Academy")
+            .replace("[\"prinzcl\",\"nightowl\"]", "[\"nightowl\",\"prinzcl\"]");
         mvc.perform(put(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.staff())
             .contentType(MediaType.APPLICATION_JSON).content(updated))
             .andExpect(status().isOk()).andExpect(jsonPath("$.name").value("Academy"));
         mvc.perform(get(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.admin()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.playerIds[0]").value(2));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.playerIds[0]").value("nightowl"));
         mvc.perform(delete(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.admin()))
             .andExpect(status().isNoContent());
         mvc.perform(get(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.admin()))
@@ -89,12 +90,17 @@ class CrudApiTests {
         long id = create();
         mvc.perform(get(BASE).header("Authorization", "Bearer " + TestTokens.fan())).andExpect(status().isOk());
         mvc.perform(get(BASE + "/" + id).header("Authorization", "Bearer " + TestTokens.fan()))
-            .andExpect(status().isOk()).andExpect(jsonPath("$.playerIds[0]").value(1));
+            .andExpect(status().isOk()).andExpect(jsonPath("$.playerIds[0]").value("prinzcl"));
     }
-    @Test void jugadoresPositivosYNoRepetidos() throws Exception {
-        for (String ids : java.util.List.of("[1,1]", "[-1]", "[null]")) {
+    @Test void jugadoresValidosYNoRepetidos() throws Exception {
+        for (String ids : java.util.List.of(
+                "[\"prinzcl\",\"prinzcl\"]",
+                "[\"prinzcl\",\" prinzcl \"]",
+                "[\"\"]",
+                "[null]")) {
             mvc.perform(post(BASE).header("Authorization", "Bearer " + TestTokens.admin())
-                .contentType(MediaType.APPLICATION_JSON).content(BODY.replace("[1,2]", ids)))
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(BODY.replace("[\"prinzcl\",\"nightowl\"]", ids)))
                 .andExpect(status().isBadRequest());
         }
     }

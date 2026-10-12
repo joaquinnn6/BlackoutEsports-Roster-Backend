@@ -21,9 +21,9 @@ public class Roster {
     @Column(length = 100)
     private String status;
     @ElementCollection
-    @CollectionTable(name = "roster_players", joinColumns = @JoinColumn(name = "roster_id"),
+    @CollectionTable(name = "roster_player_refs", joinColumns = @JoinColumn(name = "roster_id"),
         uniqueConstraints = @UniqueConstraint(columnNames = {"roster_id", "player_id"}))
-    @Column(name = "player_id", nullable = false)
+    @Column(name = "player_id", nullable = false, length = 60)
     @OrderColumn(name = "position")
-    private List<Long> playerIds = new ArrayList<>();
+    private List<String> playerIds = new ArrayList<>();
 }

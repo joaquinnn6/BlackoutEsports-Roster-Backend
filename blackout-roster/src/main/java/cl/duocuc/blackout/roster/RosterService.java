@@ -34,7 +34,8 @@ public class RosterService {
             new ResponseStatusException(HttpStatus.NOT_FOUND, "Roster no encontrado"));
     }
     private void apply(Roster roster, RosterRequest request) {
-        if (new HashSet<>(request.playerIds()).size() != request.playerIds().size())
+        List<String> playerIds = request.playerIds().stream().map(String::trim).toList();
+        if (new HashSet<>(playerIds).size() != playerIds.size())
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No se puede repetir un jugador en el roster");
         roster.setName(request.name().trim());
         roster.setGame(request.game().trim());
@@ -48,6 +49,6 @@ public class RosterService {
             repository.flush();
         }
         roster.getPlayerIds().clear();
-        roster.getPlayerIds().addAll(request.playerIds());
+        roster.getPlayerIds().addAll(playerIds);
     }
 }
