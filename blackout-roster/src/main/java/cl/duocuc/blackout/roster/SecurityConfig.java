@@ -44,7 +44,7 @@ public class SecurityConfig {
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/swagger-ui.html", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/rosters", "/api/rosters/**").hasAnyRole("Fan", "Admin", "Staff")
+                .requestMatchers(HttpMethod.GET, "/api/rosters", "/api/rosters/**").permitAll()
                 .requestMatchers("/api/rosters", "/api/rosters/**").hasAnyRole("Admin", "Staff")
                 .anyRequest().denyAll())
             .oauth2ResourceServer(oauth -> oauth.jwt(jwt ->

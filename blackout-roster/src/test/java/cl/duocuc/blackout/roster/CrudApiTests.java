@@ -56,8 +56,8 @@ class CrudApiTests {
             .andExpect(status().isForbidden());
         mvc.perform(delete(BASE + "/" + id).header("Authorization", bearer)).andExpect(status().isForbidden());
     }
-    @Test void sinTokenYTokenInvalidoDevuelven401() throws Exception {
-        mvc.perform(get(BASE)).andExpect(status().isUnauthorized());
+    @Test void lecturaEsPublicaYEscrituraRequiereTokenValido() throws Exception {
+        mvc.perform(get(BASE)).andExpect(status().isOk());
         mvc.perform(post(BASE).contentType(MediaType.APPLICATION_JSON).content(BODY)).andExpect(status().isUnauthorized());
         mvc.perform(get(BASE).header("Authorization", "Bearer incorrecto")).andExpect(status().isUnauthorized());
     }
